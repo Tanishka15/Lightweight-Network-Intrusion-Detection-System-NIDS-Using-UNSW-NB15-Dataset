@@ -1,139 +1,84 @@
 
-# Lightweight Network Intrusion Detection System (NIDS) Using UNSW-NB15 Dataset
+# Network Intrusion Detection System Using Machine Learning
 
-## Project Overview
+This project implements a lightweight Machine Learning-based Intrusion Detection System (IDS) using the **UNSW-NB15 dataset**. It includes full preprocessing, feature selection, class balancing using SMOTE, and evaluation using Decision Tree and Random Forest classifiers.
 
-This project implements a lightweight and efficient machine learning pipeline to detect malicious network activity using the UNSW-NB15 dataset. The system classifies traffic into two categories: normal and attack. It includes robust preprocessing, feature selection, class balancing, and performance evaluation using multiple machine learning models.
+---
 
-## 1. Dataset Description
+## 📁 Dataset
 
-**UNSW-NB15 Dataset** is a modern and comprehensive dataset for evaluating intrusion detection systems. It includes a mix of normal and malicious traffic with 49 features per record, categorized as:
+The [UNSW-NB15 dataset](https://www.unsw.adfa.edu.au/unsw-canberra-cyber/cybersecurity/ADFA-NB15-Datasets/) contains synthetic contemporary normal and attack activities, used to benchmark network intrusion detection systems.
 
-- Flow features (e.g., duration, bytes, packets)
-- Content features (e.g., TCP window size)
-- Time features
-- Additional aggregated features
-- Labels: 
-  - `label = 0`: Normal traffic
-  - `label = 1`: Malicious traffic
+In this pipeline:
+- `UNSW-NB15_1.csv` and `UNSW-NB15_2.csv` are loaded with correct headers.
+- Sampled down to 5,000 rows for fast prototyping.
+- Columns like `srcip`, `sport`, `dstip`, `dsport`, `Stime`, and `Ltime` are removed.
 
-## 2. Project Workflow
+---
 
-### 2.1 Data Loading
-- Two CSV files (`UNSW-NB15_1.csv`, `UNSW-NB15_2.csv`) are loaded with correct column headers.
-- Concatenated and downsampled to 5,000 rows for faster experimentation.
+## ⚙️ Pipeline Overview
 
-### 2.2 Data Validation
-- Duplicate rows are identified.
-- Column names are checked against the expected schema.
-- Dropped non-informative identifiers:
-  - `srcip`, `sport`, `dstip`, `dsport`, `Stime`, `Ltime`
-- Ensured presence of the `label` column.
+### 1. Data Preprocessing
+- Drop irrelevant identifiers and timestamps
+- Handle missing values (numerical and categorical)
+- Label encoding of categorical features
+- Standardization using `StandardScaler`
 
-## 3. Preprocessing Steps
+### 2. Feature Selection
+- `SelectKBest` with `mutual_info_classif` used to retain top `k=15` or `20` features
 
-### 3.1 Target Transformation
-- Binary encoding of `label`: 
-  - `0` for normal 
-  - `1` for all types of attacks
+### 3. Class Balancing
+- `SMOTE` used to balance classes and address data imbalance
 
-### 3.2 Handling Categorical Variables
-- Label encoding applied to:
-  - `proto`, `state`, `service`, `ct_ftp_cmd`, etc.
+### 4. Model Training
+- Models:
+  - `DecisionTreeClassifier` (max_depth=5)
+  - `RandomForestClassifier` with `class_weight='balanced_subsample'`
+- 5-fold cross-validation using ROC-AUC
 
-### 3.3 Missing Values
-- Categorical: Unknown values handled with placeholder labels.
-- Numerical: Imputed with median values.
+### 5. Evaluation
+- Accuracy, Confusion Matrix, ROC-AUC
+- Classification report with precision, recall, f1-score
+- Top important features based on `feature_importances_`
 
-## 4. Feature Engineering
+---
 
-### 4.1 Standardization
-- Used `StandardScaler` to normalize numerical features.
+## ✅ Results
 
-### 4.2 Feature Selection
-- Applied `SelectKBest` with `mutual_info_classif` to select the most informative features.
-- Retained top 15–20 features depending on the pipeline.
+- **Cross-Validation ROC-AUC**: ~0.999  
+- **Test Accuracy**: ~99.1%  
+- **ROC-AUC on test set**: ~0.9989  
 
-## 5. Modeling Approaches
-
-### 5.1 Baseline: Decision Tree Classifier
-- Simple tree with `max_depth=5` to establish initial performance benchmarks.
-
-### 5.2 Final Model: Random Forest with SMOTE
-- Random Forest with:
-  - `n_estimators=100`
-  - `max_depth=8`
-  - `class_weight='balanced_subsample'`
-- SMOTE applied within an `imblearn.pipeline.Pipeline` for oversampling the minority class.
-- Cross-validation used to assess generalization.
-
-## 6. Evaluation Metrics
-
-### Cross-Validation
-- 5-fold cross-validation using ROC-AUC as the scoring metric.
-- Reported mean ROC-AUC with standard deviation.
-
-### Final Testing
-- Evaluation metrics:
-  - Accuracy
-  - ROC-AUC Score
-  - Confusion Matrix
-  - Classification Report (Precision, Recall, F1-score)
-
-### Example Results
-- Accuracy: 0.9910
-- ROC-AUC: 0.9989
-- Confusion Matrix:
-  ```
-  [[2817   24]
-   [   3  156]]
-  ```
-
-## 7. Feature Importance
-
-Top contributing features (example output from Random Forest):
-- `ct_state_ttl`
-- `sttl`
-- `Dload`
-- `dmeansz`
-- `Dpkts`
-- `dttl`
-- `dbytes`
-- `dur`
-- `ackdat`
-- `synack`
-
-## 8. Next Steps and Future Enhancements
-
-- Visualizations of ROC and Precision-Recall curves.
-- Hyperparameter tuning using GridSearchCV.
-- Comparison with other classifiers (e.g., XGBoost, LightGBM).
-- Real-time deployment via Flask or FastAPI.
-- Integration with packet capture tools (e.g., Scapy, Zeek).
-- Stream ingestion using Kafka or RabbitMQ.
-
-## 9. Dependencies
-
-```bash
-pandas
-numpy
-scikit-learn
-imblearn
-matplotlib (for future visualizations)
+**Confusion Matrix**:
+```
+[[2817   24]
+ [   3  156]]
 ```
 
-## 10. File Structure
+---
 
-```
-nids_unsw_nb15/
-│
-├── unsw_pipeline.py              # Main script with full ML pipeline
-├── UNSW-NB15_1.csv               # Partial dataset 1
-├── UNSW-NB15_2.csv               # Partial dataset 2
-├── README.md                     # Project documentation
-└── models/                       # (Optional) Saved models for deployment
-```
+## 🔍 Key Features
 
-## 11. Conclusion
+| Feature          | Importance |
+|------------------|------------|
+| `ct_state_ttl`   | 0.2696     |
+| `sttl`           | 0.2561     |
+| `Dload`          | 0.1068     |
+| `dmeansz`        | 0.0702     |
+| `Dpkts`          | 0.0499     |
 
-This project demonstrates an effective and lightweight machine learning approach to building a network intrusion detection system using the UNSW-NB15 dataset. The system balances detection accuracy with performance efficiency, making it suitable for practical deployment scenarios with moderate resource constraints.
+---
+
+## 🧠 What is SMOTE?
+
+SMOTE (Synthetic Minority Over-sampling Technique) is a technique used to balance imbalanced datasets. It works by creating synthetic samples of the minority class to ensure classifiers are trained more fairly. This improves recall and F1 scores for the attack class.
+
+---
+
+## 📚 References
+
+This project was inspired in part by:
+
+- [Intrusion Detection System Using Machine Learning – Western OC2 Lab](https://github.com/Western-OC2-Lab/Intrusion-Detection-System-Using-Machine-Learning), particularly the [LCCDE_IDS_GlobeCom22.ipynb](https://github.com/Western-OC2-Lab/Intrusion-Detection-System-Using-Machine-Learning/blob/main/LCCDE_IDS_GlobeCom22.ipynb) notebook.
+
+I thank the original authors for their valuable contribution. Their repository is licensed under the [MIT License](https://github.com/Western-OC2-Lab/Intrusion-Detection-System-Using-Machine-Learning/blob/main/LICENSE).
