@@ -5,7 +5,7 @@ This project implements a lightweight Machine Learning-based Intrusion Detection
 
 ---
 
-## 📁 Dataset
+##  Dataset
 
 The [UNSW-NB15 dataset](https://www.unsw.adfa.edu.au/unsw-canberra-cyber/cybersecurity/ADFA-NB15-Datasets/) contains synthetic contemporary normal and attack activities, used to benchmark network intrusion detection systems.
 
@@ -43,7 +43,7 @@ In this pipeline:
 
 ---
 
-## ✅ Results
+## Results
 
 - **Cross-Validation ROC-AUC**: ~0.999  
 - **Test Accuracy**: ~99.1%  
@@ -69,13 +69,13 @@ In this pipeline:
 
 ---
 
-## 🧠 What is SMOTE?
+## What is SMOTE?
 
 SMOTE (Synthetic Minority Over-sampling Technique) is a technique used to balance imbalanced datasets. It works by creating synthetic samples of the minority class to ensure classifiers are trained more fairly. This improves recall and F1 scores for the attack class.
 
 ---
 
-## 📚 References
+## References
 
 This project was inspired in part by:
 
