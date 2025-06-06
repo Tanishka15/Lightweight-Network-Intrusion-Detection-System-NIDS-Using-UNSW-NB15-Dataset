@@ -16,7 +16,7 @@ In this pipeline:
 
 ---
 
-## ⚙️ Pipeline Overview
+## Pipeline Overview
 
 ### 1. Data Preprocessing
 - Drop irrelevant identifiers and timestamps
@@ -57,7 +57,7 @@ In this pipeline:
 
 ---
 
-## 🔍 Key Features
+## Key Features
 
 | Feature          | Importance |
 |------------------|------------|
